@@ -102,7 +102,7 @@ public class FakeFhirBundleCreator {
     }
 
     private Path createPath(String praefix, String id) {
-        return Paths.get(Neo4jBundleLoader.DIR_IMPORT + "test", praefix + StringUtils.leftPad(id, PADDING_SIZE) + SUFFIX_JSON, "0");
+        return Paths.get(Neo4jBundleLoader.DIR_IMPORT, praefix + StringUtils.leftPad(id, PADDING_SIZE) + SUFFIX_JSON, "0");
     }
 
     private void writeJson(Path path, Object jsonObject) throws IOException {
