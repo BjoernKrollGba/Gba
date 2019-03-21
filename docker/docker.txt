@@ -1,0 +1,1 @@
+docker run -d --name=neo4j --rm -p=7474:7474 -p=7687:7687 -v=.\data:/data -v=.\fhirsource:/import neo4j-apocdocker
