@@ -1,0 +1,57 @@
+:param number_patients: 100000, number_observations: 100, x: 3
+
+:param x: 3
+
+MATCH (p:Patient)-[:SUBJECT]-(o:Observation)
+WHERE o.value < $x
+RETURN size(collect(DISTINCT p)), $number_patients * (1 - ( ((1.0 * $number_observations - $x)/$number_observations) ^ $number_observations))
+
+MATCH (p:Patient)-[:SUBJECT]-(o:Observation)--(c:Code)
+WHERE o.value < $x AND c.system = "lens" AND c.code = "42"
+RETURN size(collect(DISTINCT p)), $number_patients * $x / $number_observations
+
+
+
+
+
+------
+CALL apoc.load.json("file:/import/Bundle_1.json")
+YIELD value AS b
+UNWIND b.items AS item
+FOREACH(ignoreMe IN CASE WHEN item.resourceType = "Patient" THEN [1] ELSE [] END |
+	MERGE (patient:Patient {id: "Patient/" +item.id})
+	SET patient.resourceType = item.resourceType)
+FOREACH(ignoreMe IN CASE WHEN item.resourceType = "Observation" THEN [1] ELSE [] END |
+    MERGE (patient:Patient {id: item.subject.reference})
+    MERGE (observation:Observation {id:item.id})
+    ON CREATE SET
+        observation.status = item.status,
+        observation.resourceType = item.resourceType,
+        observation.status = item.status,
+        observation.value = item.valueQuantity.value
+    FOREACH (c IN item.code |
+        MERGE (code:Code {system: c.system, code:  c.code})
+        MERGE (observation)-[:HAS_CODE]->(code))
+    MERGE (patient)<-[:SUBJECT]-(observation))
+
+
+
+-----------------------
+Upload mit 1000 Patienten / je ca. 100 Observations
+10 Minuten : ca.  40000
+20 Minuten : ca.  60000
+30 Minuten : ca.  73000
+40 Minuten : ca.  85000
+50 Minuten : ca.  95000
+58 Minuten : ca. 101000
+
+Mär 21, 2019 8:00:56 AM org.neo4j.driver.internal.logging.JULogger info
+INFORMATION: Direct driver instance 403716510 created for server address localhost:7687
+Mär 21, 2019 8:58:18 AM org.neo4j.driver.internal.logging.JULogger info
+INFORMATION: Closing driver instance 403716510
+Mär 21, 2019 8:58:18 AM org.neo4j.driver.internal.logging.JULogger info
+INFORMATION: Closing connection pool towards localhost:7687
+
+
+ABFRAGE 1: braucht 352 Millisekunden
+ABFRAGE 2: braucht  29 Millisekunden

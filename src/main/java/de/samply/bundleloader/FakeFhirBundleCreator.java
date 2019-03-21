@@ -26,7 +26,7 @@ public class FakeFhirBundleCreator {
     private final static int NUMBER_PATIENTS_PER_BUNDLE = 1;
     private final static int NUMBER_OBSERVATIONS_PER_PATIENT = 100;
 
-    private final static int PADDING_SIZE = Double.valueOf(Math.ceil(Math.log10(NUMBER_PATIENTS_PER_BUNDLE))).intValue();
+    private final static int PADDING_SIZE = Double.valueOf(Math.ceil(Math.log10(NUMBER_BUNDLES))).intValue();
 
     public static void main(String[] args) throws IOException {
         new FakeFhirBundleCreator().create();
@@ -102,7 +102,7 @@ public class FakeFhirBundleCreator {
     }
 
     private Path createPath(String praefix, String id) {
-        return Paths.get(Neo4jBundleLoader.DIR_IMPORT, praefix + StringUtils.leftPad(id, PADDING_SIZE) + SUFFIX_JSON);
+        return Paths.get(Neo4jBundleLoader.DIR_IMPORT + "test", praefix + StringUtils.leftPad(id, PADDING_SIZE) + SUFFIX_JSON, "0");
     }
 
     private void writeJson(Path path, Object jsonObject) throws IOException {
