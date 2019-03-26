@@ -1,0 +1,44 @@
+{
+    "resourceType": "Observation",
+    "id": "1325860",
+    "meta": {
+      "versionId": "1",
+      "lastUpdated": "2019-02-06T19:24:56.744+00:00"
+    },
+    "status": "final",
+    "category": [
+      {
+        "coding": [
+          {
+            "system": "http://hl7.org/fhir/observation-category",
+            "code": "vital-signs",
+            "display": "vital-signs"
+          }
+        ]
+      }
+    ],
+    "code": {
+      "coding": [
+        {
+          "system": "http://loinc.org",
+          "code": "72514-3",
+          "display": "Pain severity - 0-10 verbal numeric rating [Score] - Reported"
+        }
+      ],
+      "text": "Pain severity - 0-10 verbal numeric rating [Score] - Reported"
+    },
+    "subject": {
+      "reference": "Patient/1325609"
+    },
+    "context": {
+      "reference": "Encounter/1325858"
+    },
+    "effectiveDateTime": "2016-01-23T00:05:26-05:00",
+    "issued": "2016-01-23T00:05:26.910-05:00",
+    "valueQuantity": {
+      "value": 1.0604683206716699,
+      "unit": "{score}",
+      "system": "http://unitsofmeasure.org",
+      "code": "{score}"
+    }
+}

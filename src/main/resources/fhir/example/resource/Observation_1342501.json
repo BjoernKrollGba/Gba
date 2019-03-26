@@ -1,0 +1,48 @@
+{
+  "resourceType": "Observation",
+  "id": "1342501",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2019-02-06T19:33:06.800+00:00"
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://hl7.org/fhir/observation-category",
+          "code": "survey",
+          "display": "survey"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "72166-2",
+        "display": "Tobacco smoking status NHIS"
+      }
+    ],
+    "text": "Tobacco smoking status NHIS"
+  },
+  "subject": {
+    "reference": "Patient/1342419"
+  },
+  "context": {
+    "reference": "Encounter/1342495"
+  },
+  "effectiveDateTime": "2014-03-17T06:59:55-04:00",
+  "issued": "2014-03-17T06:59:55.094-04:00",
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "8517006",
+        "display": "Former smoker"
+      }
+    ],
+    "text": "Former smoker"
+  }
+}

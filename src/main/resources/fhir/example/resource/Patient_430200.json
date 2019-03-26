@@ -1,0 +1,34 @@
+{
+  "resourceType": "Patient",
+  "id": "430200",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2018-11-06T19:10:55.176+00:00"
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><div class=\"hapiHeaderText\">X <b>AUTOONLY-C1871BBF-04F8-4F41-BF42-CD3C496E5235 </b></div><table class=\"hapiPropertyTable\"><tbody><tr><td>Identifier</td><td>116210</td></tr><tr><td>Date of birth</td><td><span>01 November 1970</span></td></tr></tbody></table></div>"
+  },
+  "identifier": [
+    {
+      "use": "official",
+      "system": "urn:lumiradx:consult",
+      "value": "116210"
+    },
+    {
+      "use": "secondary",
+      "system": "urn:lumiradx:mpi",
+      "value": "116210"
+    }
+  ],
+  "name": [
+    {
+      "family": "AUTOONLY-C1871BBF-04F8-4F41-BF42-CD3C496E5235",
+      "given": [
+        "X"
+      ]
+    }
+  ],
+  "gender": "male",
+  "birthDate": "1970-11-01"
+}
