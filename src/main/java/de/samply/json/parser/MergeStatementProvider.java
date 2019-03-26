@@ -43,7 +43,7 @@ class MergeStatementProvider {
                     append(", resourceType: ").append(QUOTATION_MARKS).append(targetEntity.getResurceType()).append(QUOTATION_MARKS).append(" }");
             builder.append(")").append(NEWLINE);
         } else {
-            builder.append("MERGE (").append(getAliasName(node, nodeKeyMap)).append(":").append(node.getNeo4jNodeLabel());
+            builder.append("CREATE (").append(getAliasName(node, nodeKeyMap)).append(":").append(node.getNeo4jNodeLabel());
             builder.append(" { ");
             boolean first = true;
             for (FhirJsonProperty property : node.getProperties()) {
@@ -71,12 +71,16 @@ class MergeStatementProvider {
                 "[" + StringUtils.join(
                 namedCollection.getValues().stream().map(Object::toString).map(this::escape).map(value -> QUOTATION_MARKS + value + QUOTATION_MARKS).collect(Collectors.toList()), ",") + "]"));
         if (!propertyLines.isEmpty()) {
-            appenOnSet("ON MATCH SET ", propertyLines, builder);
-            appenOnSet("ON CREATE SET ", propertyLines, builder);
+            if (node.isEntityNode()) {
+                appenSetStatement("ON MATCH SET ", propertyLines, builder);
+                appenSetStatement("ON CREATE SET ", propertyLines, builder);
+            } else {
+                appenSetStatement("SET ", propertyLines, builder);
+            }
         }
     }
 
-    private void appenOnSet(String on_set_mode, List<String> propertyLines, StringBuilder builder) {
+    private void appenSetStatement(String on_set_mode, List<String> propertyLines, StringBuilder builder) {
         builder.append(on_set_mode);
         builder.append(NEWLINE);
         builder.append(IDENT);

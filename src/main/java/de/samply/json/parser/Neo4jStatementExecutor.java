@@ -19,12 +19,14 @@ public class Neo4jStatementExecutor implements AutoCloseable {
         driver.close();
     }
 
-    void execute(final String statement) {
+    void execute(final String... statements) {
         try (Session session = driver.session()) {
-            String observation = session.writeTransaction(tx -> {
-                StatementResult result = tx.run(statement);
-                return "DONE";
-            });
+            for (String statement : statements) {
+                session.writeTransaction(tx -> {
+                    tx.run(statement);
+                    return "DONE";
+                });
+            }
         }
     }
 

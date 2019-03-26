@@ -1,1 +1,20 @@
-docker run -d --name=neo4j --rm -p=7474:7474 -p=7687:7687 -v=.\data:/data -v=.\fhirsource:/import neo4j-apocdocker
+// Build command
+docker build -t neo4j-apoc .
+
+// Im Unterverzeichnis von ..../docker ausführen
+// Die beiden Verzeichnisse
+//      [absolute-path-to-dir-outside-docker]/data
+//      [absolute-path-to-dir-outside-docker]/fhirsource
+// müssen existieren
+// Das Verzeichnis
+//      [absolute-path-to-dir-outside-docker]/data
+// sollte beim ersten Start leer sein
+//
+// Nach dem Starten die Web-Oberfläche http://localhost:7474/browser aufrufen
+// Es wird beim ersten Start nach Benutzer/Passwort gefragt ("neo4j"/"neo4j")
+// Passwort ändern in "neo4jneo4j"
+//
+docker run -d --name=neo4j --rm -p=7474:7474 -p=7687:7687 -v=[absolute-path-to-dir-outside-docker]/data:/data -v=[absolute-path-to-dir-outside-docker]/fhirsource:/import neo4j-apoc
+
+
+(e.g. docker run -d --name=neo4j --rm -p=7474:7474 -p=7687:7687 -v=C://Users/BjoernKroll/neo4j/data:/data -v=C://Users/BjoernKroll/neo4j/fhirsource:/import neo4j-apoc)

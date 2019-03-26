@@ -4,6 +4,8 @@ import de.samply.json.parser.model.FhirJsonNodeEntity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExampleFhirResourceUploader {
 
@@ -19,9 +21,11 @@ public class ExampleFhirResourceUploader {
         executeStatement(PATHNAME_ENCOUNTER_1);
     }
 
-    private static void executeStatement(String pathnameObservation1) throws Exception {
+    private static void executeStatement(String pathname) throws Exception {
+        List<String> statements = new ArrayList<>();
+        statements.add(createStatement(pathname));
         try (Neo4jStatementExecutor executor = new Neo4jStatementExecutor()) {
-            executor.execute(createStatement(pathnameObservation1));
+            executor.execute(statements.toArray(new String[]{}));
         }
     }
 
