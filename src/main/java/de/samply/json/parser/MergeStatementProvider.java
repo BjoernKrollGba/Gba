@@ -6,10 +6,7 @@ import de.samply.json.parser.model.FhirJsonProperty;
 import de.samply.json.parser.model.FhirJsonRelationTo;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 class MergeStatementProvider {
@@ -18,24 +15,33 @@ class MergeStatementProvider {
     private static final String QUOTATION_MARKS = "'";
     private static final String IDENT = "   ";
 
-    String create(FhirJsonNodeEntity entity) {
+    String create(List<? extends FhirJsonNodeEntity> entities) {
         StringBuilder builder = new StringBuilder();
         Map<AbstractFhirJsonNode, String> nodeKeyMap = new HashMap<>();
+        Set<AbstractFhirJsonNode> mergedNodes = new HashSet<>();
 
-        append(entity, builder, nodeKeyMap);
+        for (FhirJsonNodeEntity entity : entities) {
+            append(entity, builder, nodeKeyMap, mergedNodes);
+        }
 
         return builder.toString();
     }
 
-    private void append(AbstractFhirJsonNode entity, StringBuilder builder, Map<AbstractFhirJsonNode, String> nodeKeyMap) {
-        appendNodeMerge(entity, builder, nodeKeyMap);
+    private void append(AbstractFhirJsonNode entity, StringBuilder builder, Map<AbstractFhirJsonNode, String> nodeKeyMap, Set<AbstractFhirJsonNode> mergedNodes) {
+        appendNodeMerge(entity, builder, nodeKeyMap, mergedNodes);
         appendPropertiesCreate(entity, builder, nodeKeyMap);
         for (FhirJsonRelationTo relation : entity.getRelations()) {
-            appendRelation(entity, relation, builder, nodeKeyMap);
+            appendRelation(entity, relation, builder, nodeKeyMap, mergedNodes);
         }
     }
 
-    private void appendNodeMerge(AbstractFhirJsonNode node, StringBuilder builder, Map<AbstractFhirJsonNode, String> nodeKeyMap) {
+    private void appendNodeMerge(AbstractFhirJsonNode node, StringBuilder builder, Map<AbstractFhirJsonNode, String> nodeKeyMap, Set<AbstractFhirJsonNode> mergedNodes) {
+        if (mergedNodes.contains(node)) {
+            return;
+        } else {
+            mergedNodes.add(node);
+        }
+
         if (node.isEntityNode()) {
             FhirJsonNodeEntity targetEntity = (FhirJsonNodeEntity) node;
             builder.append("MERGE (").append(getAliasName(node, nodeKeyMap)).append(":").append(targetEntity.getNeo4jNodeLabel());
@@ -97,10 +103,10 @@ class MergeStatementProvider {
         return escape(property.getValue().toString());
     }
 
-    private void appendRelation(AbstractFhirJsonNode node, FhirJsonRelationTo relation, StringBuilder builder, Map<AbstractFhirJsonNode, String> nodeKeyMap) {
+    private void appendRelation(AbstractFhirJsonNode node, FhirJsonRelationTo relation, StringBuilder builder, Map<AbstractFhirJsonNode, String> nodeKeyMap, Set<AbstractFhirJsonNode> mergedNodes) {
         //     builder.append("MERGE (").append(relation.getName()).append(":").append(StringUtils.capitalize(relation.getName())).append(")");
         AbstractFhirJsonNode target = relation.getTarget();
-        append(target, builder, nodeKeyMap);
+        append(target, builder, nodeKeyMap, mergedNodes);
 
         builder.append("MERGE (").append(getAliasName(node, nodeKeyMap))
                 .append(")-[:").append(StringUtils.upperCase(relation.getTag())).append("]->(")

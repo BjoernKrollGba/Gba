@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class FhirJsonParser {
@@ -22,31 +24,36 @@ public class FhirJsonParser {
     private final File sourceFile;
 
     public static void main(String[] args) throws IOException {
-        AbstractFhirJsonNode result = new FhirJsonParser(new File(PATHNAME_OBSERVATION)).parseFhirResource();
+        List<AbstractFhirJsonNode> resultList = new FhirJsonParser(new File(PATHNAME_OBSERVATION)).parseFhirResource();
 
-        System.out.println("Resource Type: " + ((FhirJsonNodeEntity) result).getResurceType());
-        System.out.println("ID: " + ((FhirJsonNodeEntity) result).getId());
+        System.out.println("First Resource Type: " + ((FhirJsonNodeEntity) resultList.get(0)).getResurceType());
+        System.out.println("First ID: " + ((FhirJsonNodeEntity) resultList.get(0)).getId());
     }
 
     FhirJsonParser(File sourceFile) {
         this.sourceFile = sourceFile;
     }
 
-    AbstractFhirJsonNode parseFhirResource() throws IOException {
+    List<AbstractFhirJsonNode> parseFhirResource() throws IOException {
+        List<AbstractFhirJsonNode> resultList = new ArrayList<>();
+
         JsonParser jsonParser = new JsonFactory().createParser(sourceFile);
 
         JsonToken token = jsonParser.nextToken();
         if (token == JsonToken.START_OBJECT) {
-            return parseFhirResourceNode(true, jsonParser, "");
+            resultList.add(parseFhirResourceNode(true, jsonParser, ""));
+            return resultList;
         }
 
         if (token == JsonToken.START_ARRAY) {
-            FhirJsonNodeEntity nodeEntity = new FhirJsonNodeEntity();
-            addFhirResourceArrayToNode(nodeEntity, "array", jsonParser);
-            return nodeEntity;
-        }
+            token = jsonParser.nextToken();
 
-        return null;
+            while (token != JsonToken.END_ARRAY) {
+                resultList.add(parseFhirResourceNode(true, jsonParser, ""));
+                token = jsonParser.nextToken();
+            }
+        }
+        return resultList;
     }
 
     private AbstractFhirJsonNode parseFhirResourceNode(final boolean isEntity, final JsonParser jsonParser, String neo4jLabel) throws IOException {
