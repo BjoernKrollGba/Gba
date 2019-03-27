@@ -1,9 +1,10 @@
 package de.samply.json.parser;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import de.samply.json.parser.model.AbstractFhirJsonNode;
 import de.samply.json.parser.model.FhirJsonNodeEntity;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class ExampleFhirResourceUploader {
     private static void executeStatement(String[] pathnames) throws Exception {
         List<String> statements = new ArrayList<>();
         for (String pathname: pathnames) {
-            statements.add(createStatement(pathname));
+            statements.addAll(createStatement(pathname));
         }
 
         try (Neo4jStatementExecutor executor = new Neo4jStatementExecutor()) {
@@ -40,17 +41,28 @@ public class ExampleFhirResourceUploader {
         }
     }
 
-    private static String createStatement(String filename) throws IOException {
-        List<AbstractFhirJsonNode> nodes = new FhirJsonParser(new File(filename)).parseFhirResource();
+    private static List<String> createStatement(String filename) throws IOException {
+        JsonParser jsonParser = createJsonParser(filename);
+        List<AbstractFhirJsonNode> nodes = new FhirJsonParser().parseFhirResource(jsonParser);
         List<FhirJsonNodeEntity> entities = nodes.stream().
                 filter(AbstractFhirJsonNode::isEntityNode).
                 map(node -> (FhirJsonNodeEntity) node).collect(Collectors.toList());
-        String statement = new MergeStatementProvider().create(entities);
+        List<String> statements = new ArrayList<>();
+        for (FhirJsonNodeEntity entity : entities) {
+            statements.add(new MergeStatementProvider().create(entity));
+        }
+        for (String statement : statements) {
+            System.out.println(statement);
+            System.out.println("-------------------------------------------------------------------------------");
+        }
 
-        System.out.println(statement);
-        System.out.println("-------------------------------------------------------------------------------");
+        return statements;
+    }
 
-        return statement;
+    private static JsonParser createJsonParser(String filename) throws IOException {
+        FakeArrayBundleProvider provider = new FakeArrayBundleProvider(1);
+        return new JsonFactory().createParser(provider.createWriter().toString());
+//        return new JsonFactory().createParser(new File(filename));
     }
 
 

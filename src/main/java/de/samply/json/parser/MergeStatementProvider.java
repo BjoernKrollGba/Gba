@@ -15,6 +15,10 @@ class MergeStatementProvider {
     private static final String QUOTATION_MARKS = "'";
     private static final String IDENT = "   ";
 
+    String create(FhirJsonNodeEntity entity) {
+        return create(Collections.singletonList(entity));
+    }
+
     String create(List<? extends FhirJsonNodeEntity> entities) {
         StringBuilder builder = new StringBuilder();
         Map<AbstractFhirJsonNode, String> nodeKeyMap = new HashMap<>();

@@ -21,23 +21,17 @@ public class FhirJsonParser {
     private static final String NAME_ID = "id";
     private static final String NAME_REFERENCE = "reference";
 
-    private final File sourceFile;
-
     public static void main(String[] args) throws IOException {
-        List<AbstractFhirJsonNode> resultList = new FhirJsonParser(new File(PATHNAME_OBSERVATION)).parseFhirResource();
+        JsonParser jsonParser = new JsonFactory().createParser(new File(PATHNAME_OBSERVATION));
+
+        List<AbstractFhirJsonNode> resultList = new FhirJsonParser().parseFhirResource(jsonParser);
 
         System.out.println("First Resource Type: " + ((FhirJsonNodeEntity) resultList.get(0)).getResurceType());
         System.out.println("First ID: " + ((FhirJsonNodeEntity) resultList.get(0)).getId());
     }
 
-    FhirJsonParser(File sourceFile) {
-        this.sourceFile = sourceFile;
-    }
-
-    List<AbstractFhirJsonNode> parseFhirResource() throws IOException {
+    List<AbstractFhirJsonNode> parseFhirResource(JsonParser jsonParser) throws IOException {
         List<AbstractFhirJsonNode> resultList = new ArrayList<>();
-
-        JsonParser jsonParser = new JsonFactory().createParser(sourceFile);
 
         JsonToken token = jsonParser.nextToken();
         if (token == JsonToken.START_OBJECT) {
