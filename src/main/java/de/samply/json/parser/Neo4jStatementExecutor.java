@@ -1,5 +1,6 @@
 package de.samply.json.parser;
 
+import de.samply.json.parser.model.MergeStatementProvidable;
 import org.neo4j.driver.v1.*;
 
 public class Neo4jStatementExecutor implements AutoCloseable {
@@ -19,13 +20,10 @@ public class Neo4jStatementExecutor implements AutoCloseable {
         driver.close();
     }
 
-    void execute(final String... statements) {
+    void execute(final MergeStatementProvidable... statements) {
         try (Session session = driver.session()) {
-            for (String statement : statements) {
-                session.writeTransaction(tx -> {
-                    tx.run(statement);
-                    return "DONE";
-                });
+            for (MergeStatementProvidable statement : statements) {
+                session.writeTransaction(transaction -> statement.getCallback().apply(transaction));
             }
         }
     }
