@@ -1,9 +1,9 @@
 package de.samply.json.parser;
 
-import de.samply.json.parser.model.MergeStatementProvidable;
-import org.neo4j.driver.v1.Transaction;
+import de.samply.json.parser.model.AbstractCreateStatement;
 
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExampleFhirResourceIndexUploader {
 
@@ -41,19 +41,17 @@ public class ExampleFhirResourceIndexUploader {
 
     private static void executeIndexStatement() {
         try (Neo4jStatementExecutor executor = new Neo4jStatementExecutor()) {
-            MergeStatementProvidable mergeStatementProvidable = new MergeStatementProvidable() {
-                @Override
-                public Function<Transaction, String> getCallback() {
-                    return tx -> {
-                        for (String label : NEO4J_LABELS) {
-                            tx.run("CREATE CONSTRAINT ON (node:" + label + ") ASSERT node.neo4jId IS UNIQUE");
-                        }
-                        return "DONE";
-                    };
-                }
-            };
+            List<AbstractCreateStatement> indexCreateStatements = new ArrayList<>();
+            for (String label : NEO4J_LABELS) {
+                indexCreateStatements.add(new AbstractCreateStatement() {
 
-            executor.execute(mergeStatementProvidable);
+                    @Override
+                    protected String getCreateStatementTemplate() {
+                        return "CREATE CONSTRAINT ON (node:" + label + ") ASSERT node.neo4jId IS UNIQUE";
+                    }
+                });
+            }
+            executor.execute(indexCreateStatements.toArray(new AbstractCreateStatement[]{}));
         }
     }
 }

@@ -2,9 +2,9 @@ package de.samply.json.parser;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
+import de.samply.json.parser.model.AbstractCreateStatement;
 import de.samply.json.parser.model.AbstractFhirJsonNode;
 import de.samply.json.parser.model.FhirJsonNodeEntity;
-import de.samply.json.parser.model.MergeStatementProvidable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,27 +32,27 @@ public class ExampleFhirResourceUploader {
     }
 
     private static void executeStatement(String[] pathnames) throws Exception {
-        List<MergeStatementProvidable> statements = new ArrayList<>();
+        List<AbstractCreateStatement> statements = new ArrayList<>();
         for (String pathname: pathnames) {
             statements.addAll(createStatement(pathname));
         }
 
         try (Neo4jStatementExecutor executor = new Neo4jStatementExecutor()) {
-            executor.execute(statements.toArray(new MergeStatementProvidable[]{}));
+            executor.execute(statements.toArray(new AbstractCreateStatement[]{}));
         }
     }
 
-    private static List<MergeStatementProvidable> createStatement(String filename) throws IOException {
+    private static List<AbstractCreateStatement> createStatement(String filename) throws IOException {
         JsonParser jsonParser = createJsonParser(filename);
         List<AbstractFhirJsonNode> nodes = new FhirJsonParser().parseFhirResource(jsonParser);
         List<FhirJsonNodeEntity> entities = nodes.stream().
                 filter(AbstractFhirJsonNode::isEntityNode).
                 map(node -> (FhirJsonNodeEntity) node).collect(Collectors.toList());
-        List<MergeStatementProvidable> statements = new ArrayList<>();
+        List<AbstractCreateStatement> statements = new ArrayList<>();
         for (FhirJsonNodeEntity entity : entities) {
             statements.addAll(new MergeStatementProvider().create(entity));
         }
-        for (MergeStatementProvidable statement : statements) {
+        for (AbstractCreateStatement statement : statements) {
             System.out.println(statement);
             System.out.println("-------------------------------------------------------------------------------");
         }

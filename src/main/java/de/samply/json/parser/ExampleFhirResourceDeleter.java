@@ -1,9 +1,6 @@
 package de.samply.json.parser;
 
-import de.samply.json.parser.model.MergeStatementProvidable;
-import org.neo4j.driver.v1.Transaction;
-
-import java.util.function.Function;
+import de.samply.json.parser.model.AbstractCreateStatement;
 
 public class ExampleFhirResourceDeleter {
 
@@ -13,17 +10,14 @@ public class ExampleFhirResourceDeleter {
 
     private static void executeDeleteStatement() {
         try (Neo4jStatementExecutor executor = new Neo4jStatementExecutor()) {
-            MergeStatementProvidable mergeStatementProvidable = new MergeStatementProvidable() {
+            AbstractCreateStatement deleteStatement = new AbstractCreateStatement() {
                 @Override
-                public Function<Transaction, String> getCallback() {
-                    return tx -> {
-                        tx.run("match (s), (m)-[r]-(n) delete s, m, n, r");
-                        return "DONE";
-                    };
+                public String getCreateStatementTemplate() {
+                    return "match (s), (m)-[r]-(n) delete s, m, n, r";
                 }
             };
 
-            executor.execute(mergeStatementProvidable);
+            executor.execute(deleteStatement);
         }
     }
 }

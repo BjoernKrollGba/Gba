@@ -10,40 +10,40 @@ class MergeStatementProvider {
 
     private static final String QUOTATION_MARKS = "'";
 
-    List<MergeStatementProvidable> create(FhirJsonNodeEntity entity) {
+    List<AbstractCreateStatement> create(FhirJsonNodeEntity entity) {
         return create(Collections.singletonList(entity));
     }
 
-    List<MergeStatementProvidable> create(List<? extends FhirJsonNodeEntity> entities) {
+    List<AbstractCreateStatement> create(List<? extends FhirJsonNodeEntity> entities) {
         Set<AbstractFhirJsonNode> mergedNodes = new HashSet<>();
-        List<MergeStatementProvidable> mergeStatementProvidables = new ArrayList<>();
+        List<AbstractCreateStatement> statements = new ArrayList<>();
 
         for (FhirJsonNodeEntity entity : entities) {
-            append(entity, mergedNodes, mergeStatementProvidables);
+            append(entity, mergedNodes, statements);
         }
 
-        return mergeStatementProvidables;
+        return statements;
     }
 
-    private void append(AbstractFhirJsonNode node, Set<AbstractFhirJsonNode> mergedNodes, List<MergeStatementProvidable> mergeStatementProvidables) {
+    private void append(AbstractFhirJsonNode node, Set<AbstractFhirJsonNode> mergedNodes, List<AbstractCreateStatement> statements) {
         if (mergedNodes.contains(node)) {
             return;
         }
 
         mergedNodes.add(node);
-        NodeMergeStatement nodeMergeStatement = new NodeMergeStatement(node);
-        mergeStatementProvidables.add(nodeMergeStatement);
+        NodeCreateStatement nodeMergeStatement = new NodeCreateStatement(node);
+        statements.add(nodeMergeStatement);
 
         appendPropertiesCreate(node, nodeMergeStatement);
         for (FhirJsonRelationTo relation : node.getRelations()) {
-            appendRelation(node, relation, mergedNodes, mergeStatementProvidables);
+            appendRelation(node, relation, mergedNodes, statements);
         }
     }
 
-    private void appendPropertiesCreate(AbstractFhirJsonNode node, NodeMergeStatement nodeMergeStatement) {
-        node.getProperties().forEach(property -> {
-            nodeMergeStatement.addParameter(property.getName(),
-                    QUOTATION_MARKS + getPropertyValue(node, property) + QUOTATION_MARKS);});
+    private void appendPropertiesCreate(AbstractFhirJsonNode node, NodeCreateStatement nodeMergeStatement) {
+        node.getProperties().forEach(property ->
+                nodeMergeStatement.addParameter(property.getName(),
+                QUOTATION_MARKS + getPropertyValue(node, property) + QUOTATION_MARKS));
         node.getPrimitiveArrays().forEach(namedCollection -> nodeMergeStatement.addParameter(
                 namedCollection.getName(),
                 "[" + StringUtils.join(namedCollection.getValues().stream().map(Object::toString).map(this::escape).map(value -> QUOTATION_MARKS + value + QUOTATION_MARKS).collect(Collectors.toList()), ",") + "]"));
@@ -57,11 +57,11 @@ class MergeStatementProvider {
         return escape(property.getValue().toString());
     }
 
-    private void appendRelation(AbstractFhirJsonNode node, FhirJsonRelationTo relation, Set<AbstractFhirJsonNode> mergedNodes, List<MergeStatementProvidable> mergeStatementProvidables) {
+    private void appendRelation(AbstractFhirJsonNode node, FhirJsonRelationTo relation, Set<AbstractFhirJsonNode> mergedNodes, List<AbstractCreateStatement> statements) {
         AbstractFhirJsonNode target = relation.getTarget();
-        append(target, mergedNodes, mergeStatementProvidables);
+        append(target, mergedNodes, statements);
 
-        mergeStatementProvidables.add(new RelationMergeStatement(node, target, StringUtils.upperCase(relation.getTag())));
+        statements.add(new RelationCreateStatement(node, target, StringUtils.upperCase(relation.getTag())));
     }
 
     private String escape(String input) {
