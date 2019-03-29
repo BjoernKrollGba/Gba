@@ -7,13 +7,16 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class RelationMergeStatement implements  MergeStatementProvidable {
+
+    private static final String NEWLINE = System.lineSeparator();
+
     private final String mergeStatement;
     private Map<String, Object> parameters = new HashMap<>();
 
     public RelationMergeStatement(AbstractFhirJsonNode startNode, AbstractFhirJsonNode targetNode, String tag) {
-        String mergeStatementTemp = "MERGE (s: " + startNode.getNeo4jLabel() + " " + startNode.getNeo4jNodeJsonKeyPattern("start_") + ")";
-        mergeStatementTemp += "-[:" + tag + "]->";
-        mergeStatementTemp += "(t: " + targetNode.getNeo4jLabel() + " " + targetNode.getNeo4jNodeJsonKeyPattern("target_") + ")";
+        String mergeStatementTemp = "MATCH (s: " + startNode.getNeo4jLabel() + " " + startNode.getNeo4jNodeJsonKeyPattern("start_") + ")" + NEWLINE;
+        mergeStatementTemp += "MATCH (t: " + targetNode.getNeo4jLabel() + " " + targetNode.getNeo4jNodeJsonKeyPattern("target_") + ")" + NEWLINE;
+        mergeStatementTemp += "MERGE (s)-[:" + tag + "]->(t)";
 
         addParameter("start_neo4jId", startNode.getNeo4jId());
         addParameter("start_neo4jLabel", startNode.getNeo4jLabel());
@@ -33,7 +36,7 @@ public class RelationMergeStatement implements  MergeStatementProvidable {
         });
     }
 
-    public void addParameter(String name, Object value) {
+    private void addParameter(String name, Object value) {
         parameters.put(name, value);
     }
 
