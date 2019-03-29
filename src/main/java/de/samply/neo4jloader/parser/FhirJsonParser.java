@@ -1,9 +1,9 @@
-package de.samply.json.parser;
+package de.samply.neo4jloader.parser;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import de.samply.json.parser.model.*;
+import de.samply.neo4jloader.model.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -30,7 +30,7 @@ public class FhirJsonParser {
         System.out.println("First ID: " + ((FhirJsonNodeEntity) resultList.get(0)).getId());
     }
 
-    List<AbstractFhirJsonNode> parseFhirResource(JsonParser jsonParser) throws IOException {
+    public List<AbstractFhirJsonNode> parseFhirResource(JsonParser jsonParser) throws IOException {
         List<AbstractFhirJsonNode> resultList = new ArrayList<>();
 
         JsonToken token = jsonParser.nextToken();

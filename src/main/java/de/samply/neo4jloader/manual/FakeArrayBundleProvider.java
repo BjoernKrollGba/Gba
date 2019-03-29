@@ -1,4 +1,4 @@
-package de.samply.json.parser;
+package de.samply.neo4jloader.manual;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
@@ -12,9 +12,11 @@ import java.util.List;
 class FakeArrayBundleProvider {
 
     private final int mainId;
+    private final int numberOfObservations;
 
-    FakeArrayBundleProvider(int mainId) {
+    FakeArrayBundleProvider(int mainId, int numberOfObservations) {
         this.mainId = mainId;
+        this.numberOfObservations = numberOfObservations;
     }
 
     Writer createWriter() {
@@ -24,22 +26,25 @@ class FakeArrayBundleProvider {
     }
 
     List<BundleItem> items() {
-        return Collections.singletonList(new BundleItem(mainId));
+        return Collections.singletonList(new BundleItem(mainId, numberOfObservations));
     }
 
     private static class BundleItem {
         String patientId;
         String encounterId;
+        private final int numberOfObservations;
 
         @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
         List<ObservationItem> observations = new ArrayList<>();
 
-        BundleItem(int mainId) {
+        BundleItem(int mainId, int numberOfObservations) {
+            this.numberOfObservations = numberOfObservations;
+
             patientId = "P_" + mainId;
             encounterId = "E_" + mainId;
 
-            for (int i = 1; i <= 10; i++) {
-                observations.add(new ObservationItem("O_" + i));
+            for (int i = 1; i <= this.numberOfObservations; i++) {
+                observations.add(new ObservationItem("O_" + mainId + "_" + i));
             }
 
         }

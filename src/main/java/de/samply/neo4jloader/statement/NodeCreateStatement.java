@@ -1,11 +1,13 @@
-package de.samply.json.parser.model;
+package de.samply.neo4jloader.statement;
+
+import de.samply.neo4jloader.model.AbstractFhirJsonNode;
 
 public class NodeCreateStatement extends AbstractCreateStatement {
 
     private final boolean isEntityNode;
     private final String mergeStatement;
 
-    public NodeCreateStatement(AbstractFhirJsonNode node) {
+    NodeCreateStatement(AbstractFhirJsonNode node) {
         isEntityNode = node.isEntityNode();
 
         mergeStatement = (isEntityNode ? "MERGE" : "CREATE")

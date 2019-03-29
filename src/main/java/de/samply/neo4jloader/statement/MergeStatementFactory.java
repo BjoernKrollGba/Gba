@@ -1,20 +1,26 @@
-package de.samply.json.parser;
+package de.samply.neo4jloader.statement;
 
-import de.samply.json.parser.model.*;
+import de.samply.neo4jloader.model.AbstractFhirJsonNode;
+import de.samply.neo4jloader.model.FhirJsonNodeEntity;
+import de.samply.neo4jloader.model.FhirJsonProperty;
+import de.samply.neo4jloader.model.FhirJsonRelationTo;
+import de.samply.neo4jloader.statement.AbstractCreateStatement;
+import de.samply.neo4jloader.statement.NodeCreateStatement;
+import de.samply.neo4jloader.statement.RelationCreateStatement;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-class MergeStatementProvider {
+public class MergeStatementFactory {
 
     private static final String QUOTATION_MARKS = "'";
 
-    List<AbstractCreateStatement> create(FhirJsonNodeEntity entity) {
+    public List<AbstractCreateStatement> create(FhirJsonNodeEntity entity) {
         return create(Collections.singletonList(entity));
     }
 
-    List<AbstractCreateStatement> create(List<? extends FhirJsonNodeEntity> entities) {
+    public List<AbstractCreateStatement> create(List<? extends FhirJsonNodeEntity> entities) {
         Set<AbstractFhirJsonNode> mergedNodes = new HashSet<>();
         List<AbstractCreateStatement> statements = new ArrayList<>();
 

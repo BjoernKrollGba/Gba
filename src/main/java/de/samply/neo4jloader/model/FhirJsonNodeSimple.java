@@ -1,4 +1,4 @@
-package de.samply.json.parser.model;
+package de.samply.neo4jloader.model;
 
 import java.util.UUID;
 

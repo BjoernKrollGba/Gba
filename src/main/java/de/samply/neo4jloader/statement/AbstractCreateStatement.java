@@ -1,4 +1,4 @@
-package de.samply.json.parser.model;
+package de.samply.neo4jloader.statement;
 
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.driver.v1.Transaction;
@@ -15,7 +15,7 @@ public abstract class AbstractCreateStatement {
     static final String NEWLINE = System.lineSeparator();
     static final String IDENT = "   ";
 
-    public Function<Transaction, String> executeStatementInTransactionFunction() {
+    Function<Transaction, String> executeStatementInTransactionFunction() {
         return (tx -> {
             tx.run( getCreateStatementTemplate(),
                     org.neo4j.driver.v1.Values.parameters( getKeysAndValuesArray() ) );
@@ -37,7 +37,7 @@ public abstract class AbstractCreateStatement {
         return keysAndValues;
     }
 
-    public void addParameter(String name, Object value) {
+    void addParameter(String name, Object value) {
         parameters.put(name, value);
     }
 

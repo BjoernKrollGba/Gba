@@ -1,6 +1,6 @@
-package de.samply.json.parser;
+package de.samply.neo4jloader.statement;
 
-import de.samply.json.parser.model.AbstractCreateStatement;
+import de.samply.neo4jloader.statement.AbstractCreateStatement;
 import org.neo4j.driver.v1.AuthTokens;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.GraphDatabase;
@@ -10,7 +10,7 @@ public class Neo4jStatementExecutor implements AutoCloseable {
 
     private final Driver driver;
 
-    Neo4jStatementExecutor() {
+    public Neo4jStatementExecutor() {
         this("bolt://localhost:7687", "neo4j", "neo4jneo4j");
     }
 
@@ -23,7 +23,7 @@ public class Neo4jStatementExecutor implements AutoCloseable {
         driver.close();
     }
 
-    void execute(final AbstractCreateStatement... statements) {
+    public void execute(final AbstractCreateStatement... statements) {
         try (Session session = driver.session()) {
             session.writeTransaction(transaction -> {
                 for (AbstractCreateStatement statement : statements) {

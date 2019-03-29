@@ -1,6 +1,7 @@
-package de.samply.json.parser;
+package de.samply.neo4jloader.manual;
 
-import de.samply.json.parser.model.AbstractCreateStatement;
+import de.samply.neo4jloader.statement.Neo4jStatementExecutor;
+import de.samply.neo4jloader.statement.AbstractCreateStatement;
 
 import java.util.ArrayList;
 import java.util.List;
